@@ -118,13 +118,6 @@ export default function ButtonRemapper() {
       }
     });
 
-    // Add C-stick mapping
-    code += "    // C-stick mapping\n";
-    code += "    if (gc_status.cstick_x < 0x50) n64_buffer[1] |= 0x02; // C-left\n";
-    code += "    if (gc_status.cstick_x > 0xB0) n64_buffer[1] |= 0x01; // C-right\n";
-    code += "    if (gc_status.cstick_y < 0x50) n64_buffer[1] |= 0x20; // N64 L\n";
-    code += "    if (gc_status.cstick_y > 0xB0) n64_buffer[1] |= 0x08; // C-up\n\n";
-
     // Add stick value conversion
     code += "    // Use the conversion functions for stick values\n";
     code += "    char n64_x, n64_y;\n";
