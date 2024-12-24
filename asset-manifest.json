@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/gc2n64-remapper/static/css/main.4f056164.css",
-    "main.js": "/gc2n64-remapper/static/js/main.19019db1.js",
+    "main.js": "/gc2n64-remapper/static/js/main.ea68d3fb.js",
     "index.html": "/gc2n64-remapper/index.html",
     "main.4f056164.css.map": "/gc2n64-remapper/static/css/main.4f056164.css.map",
-    "main.19019db1.js.map": "/gc2n64-remapper/static/js/main.19019db1.js.map"
+    "main.ea68d3fb.js.map": "/gc2n64-remapper/static/js/main.ea68d3fb.js.map"
   },
   "entrypoints": [
     "static/css/main.4f056164.css",
-    "static/js/main.19019db1.js"
+    "static/js/main.ea68d3fb.js"
   ]
 }
