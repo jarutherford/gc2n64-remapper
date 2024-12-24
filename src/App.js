@@ -216,7 +216,7 @@ export default function ButtonRemapper() {
           <div className="bg-blue-50 dark:bg-blue-900 border border-blue-200 dark:border-blue-700 
                         rounded-lg p-4 mb-8">
             <p className="text-blue-800 dark:text-blue-200 text-sm">
-              <strong>Instructions:</strong> After generating the code, copy the entire function and replace the existing <code className="mx-2 px-2 py-1 bg-blue-100 dark:bg-blue-800 rounded">void mapGamecubeToN64()</code> function in your gamecube.ino file with this newly generated code.
+              <strong>Instructions:</strong> After generating the code, copy the entire function and replace the existing <code className="mx-2 px-2 py-1 bg-blue-100 dark:bg-blue-800 rounded">void mapGamecubeToN64()</code> function in your <code className="mx-2 px-2 py-1 bg-blue-100 dark:bg-blue-800 rounded">gamecube.ino</code> file with this newly generated code.
             </p>
           </div>
 
