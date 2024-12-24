@@ -1,0 +1,225 @@
+import React, { useState, useEffect } from 'react';
+import { Download, Upload, Code } from 'lucide-react';
+
+const ButtonRemapper = () => {
+  // Define available buttons
+  const gcButtons = [
+    "A", "B", "X", "Y", "Start", "L", "R", "Z",
+    "DUp", "DDown", "DLeft", "DRight",
+    "CStick Up", "CStick Down", "CStick Left", "CStick Right"
+  ];
+
+  const n64Buttons = [
+    "A", "B", "Z", "Start", "L", "R",
+    "DUp", "DDown", "DLeft", "DRight",
+    "CUp", "CDown", "CLeft", "CRight"
+  ];
+
+  // Initial mappings
+  const defaultMappings = {
+    "A": "A",
+    "B": "B",
+    "Z": "Z",
+    "Start": "Start",
+    "L": "L",
+    "R": "R",
+    "DUp": "DUp",
+    "DDown": "DDown",
+    "DLeft": "DLeft",
+    "DRight": "DRight",
+    "CStick Up": "CUp",
+    "CStick Down": "CDown",
+    "CStick Left": "CLeft",
+    "CStick Right": "CRight",
+    "X": "CRight",
+    "Y": "CLeft"
+  };
+
+  const [mappings, setMappings] = useState(defaultMappings);
+  const [generatedCode, setGeneratedCode] = useState('');
+
+  const buttonMasks = {
+    "A": ["data1", "0x01"],
+    "B": ["data1", "0x02"],
+    "X": ["data1", "0x04"],
+    "Y": ["data1", "0x08"],
+    "Start": ["data1", "0x10"],
+    "L": ["data2", "0x40"],
+    "R": ["data2", "0x20"],
+    "Z": ["data2", "0x10"],
+    "DUp": ["data2", "0x08"],
+    "DDown": ["data2", "0x04"],
+    "DRight": ["data2", "0x02"],
+    "DLeft": ["data2", "0x01"]
+  };
+
+  const n64ButtonMasks = {
+    "A": [0, "0x80"],
+    "B": [0, "0x40"],
+    "Z": [0, "0x20"],
+    "Start": [0, "0x10"],
+    "DUp": [0, "0x08"],
+    "DDown": [0, "0x04"],
+    "DLeft": [0, "0x02"],
+    "DRight": [0, "0x01"],
+    "L": [1, "0x20"],
+    "R": [1, "0x10"],
+    "CUp": [1, "0x08"],
+    "CDown": [1, "0x04"],
+    "CLeft": [1, "0x02"],
+    "CRight": [1, "0x01"]
+  };
+
+  const handleMappingChange = (gcButton, n64Button) => {
+    setMappings(prev => ({
+      ...prev,
+      [gcButton]: n64Button
+    }));
+  };
+
+  const generateCode = () => {
+    let code = "// Button mapping function\n";
+    code += "void mapGamecubeToN64() {\n";
+    code += "    // Clear the N64 buffer\n";
+    code += "    memset(n64_buffer, 0, sizeof(n64_buffer));\n\n";
+
+    // Standard button mappings
+    Object.entries(mappings).forEach(([gcButton, n64Button]) => {
+      if (n64Button !== "None" && buttonMasks[gcButton]) {
+        const [gcReg, gcMask] = buttonMasks[gcButton];
+        const [n64Buf, n64Mask] = n64ButtonMasks[n64Button];
+
+        code += `    // Map ${gcButton} to ${n64Button}\n`;
+        code += `    if (gc_status.${gcReg} & ${gcMask}) {\n`;
+        code += `        n64_buffer[${n64Buf}] |= ${n64Mask};\n`;
+        code += "    }\n\n";
+      }
+    });
+
+    // C-Stick mappings
+    const cstickButtons = ["CStick Up", "CStick Down", "CStick Left", "CStick Right"];
+    code += "    // C-Stick mappings\n";
+    cstickButtons.forEach(gcButton => {
+      const n64Button = mappings[gcButton];
+      if (n64Button !== "None") {
+        const direction = gcButton.split(" ").pop().toLowerCase();
+        const variable = direction === "up" || direction === "down" ? "cstick_y" : "cstick_x";
+        const threshold = (direction === "up" || direction === "right") ? "0xB0" : "0x50";
+        const comparison = (direction === "up" || direction === "right") ? ">" : "<";
+
+        const [n64Buf, n64Mask] = n64ButtonMasks[n64Button];
+        code += `    // Map ${gcButton} to ${n64Button}\n`;
+        code += `    if (gc_status.${variable} ${comparison} ${threshold}) {\n`;
+        code += `        n64_buffer[${n64Buf}] |= ${n64Mask};\n`;
+        code += "    }\n\n";
+      }
+    });
+
+    code += "}\n";
+    setGeneratedCode(code);
+  };
+
+  const saveMappings = () => {
+    const element = document.createElement("a");
+    const file = new Blob([JSON.stringify(mappings, null, 2)], {type: 'application/json'});
+    element.href = URL.createObjectURL(file);
+    element.download = "gc_n64_mappings.json";
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+  };
+
+  const loadMappings = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const loadedMappings = JSON.parse(e.target.result);
+          setMappings(loadedMappings);
+        } catch (error) {
+          alert("Error loading mappings file");
+        }
+      };
+      reader.readAsText(file);
+    }
+  };
+
+  return (
+    <div className="max-w-4xl mx-auto p-6">
+      <h1 className="text-3xl font-bold text-center mb-8">GameCube to N64 Button Remapper</h1>
+      
+      <div className="bg-white rounded-lg shadow-lg p-6">
+        <h2 className="text-xl font-semibold mb-4">Button Mappings</h2>
+        
+        <div className="grid gap-4 mb-8">
+          {gcButtons.map((gcButton) => (
+            <div key={gcButton} className="grid grid-cols-2 gap-4 items-center">
+              <label className="text-gray-700">GameCube {gcButton}:</label>
+              <select
+                value={mappings[gcButton] || "None"}
+                onChange={(e) => handleMappingChange(gcButton, e.target.value)}
+                className="form-select w-full rounded border-gray-300 shadow-sm"
+              >
+                <option value="None">None</option>
+                {n64Buttons.map((n64Button) => (
+                  <option key={n64Button} value={n64Button}>
+                    {n64Button}
+                  </option>
+                ))}
+              </select>
+            </div>
+          ))}
+        </div>
+
+        <div className="flex justify-center gap-4 mb-4">
+          <button
+            onClick={generateCode}
+            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            <Code className="w-4 h-4 mr-2" />
+            Generate Code
+          </button>
+          
+          <button
+            onClick={saveMappings}
+            className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+          >
+            <Download className="w-4 h-4 mr-2" />
+            Save Mappings
+          </button>
+          
+          <label className="inline-flex items-center px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700 cursor-pointer">
+            <Upload className="w-4 h-4 mr-2" />
+            Load Mappings
+            <input
+              type="file"
+              accept=".json"
+              onChange={loadMappings}
+              className="hidden"
+            />
+          </label>
+        </div>
+        
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
+          <p className="text-blue-800 text-sm">
+            <strong>Instructions:</strong> After generating the code, copy the entire function and replace the existing 
+            <code className="mx-2 px-2 py-1 bg-blue-100 rounded">void mapGamecubeToN64()</code> 
+            function in your gamecube.ino file with this newly generated code.
+          </p>
+        </div>
+
+        {generatedCode && (
+          <div>
+            <h3 className="text-lg font-semibold mb-2">Generated Code:</h3>
+            <pre className="bg-gray-100 p-4 rounded overflow-x-auto">
+              {generatedCode}
+            </pre>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default ButtonRemapper;
