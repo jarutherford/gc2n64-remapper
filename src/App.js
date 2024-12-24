@@ -2,19 +2,29 @@ import React, { useState, useEffect } from 'react';
 import { Code, Download, Upload, Moon, Sun } from 'lucide-react';
 
 export default function ButtonRemapper() {
-  const [isDark, setIsDark] = useState(true); // Default to dark mode
+  const [isDark, setIsDark] = useState(true);
   
   useEffect(() => {
-    // Set initial dark mode class on mount
-    document.documentElement.classList.add('dark');
-  }, []); // Empty dependency array means this only runs once on mount
-
-  const toggleTheme = () => {
-    setIsDark(!isDark);
-    if (isDark) {
+    // Check if dark mode preference exists in localStorage
+    const darkMode = localStorage.getItem('darkMode');
+    if (darkMode === 'false') {
+      setIsDark(false);
       document.documentElement.classList.remove('dark');
     } else {
+      setIsDark(true);
       document.documentElement.classList.add('dark');
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    const newDarkMode = !isDark;
+    setIsDark(newDarkMode);
+    localStorage.setItem('darkMode', newDarkMode.toString());
+    
+    if (newDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
     }
   };
 
