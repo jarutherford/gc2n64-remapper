@@ -1,8 +1,19 @@
-import React, { useState } from 'react';
-import { Code, Download, Upload } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Code, Download, Upload, Moon, Sun } from 'lucide-react';
 
 export default function ButtonRemapper() {
-  // Define available buttons
+  const [isDark, setIsDark] = useState(true); // Default to dark mode
+  
+  useEffect(() => {
+    // Apply dark mode class to document on mount and when isDark changes
+    if (isDark) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [isDark]);
+
+  // Rest of the existing button definitions...
   const gcButtons = [
     "A", "B", "X", "Y", "Start", "L", "R", "Z",
     "DUp", "DDown", "DLeft", "DRight",
@@ -15,7 +26,7 @@ export default function ButtonRemapper() {
     "CUp", "CDown", "CLeft", "CRight"
   ];
 
-  // Initial mappings
+  // Initial mappings remain the same...
   const defaultMappings = {
     "A": "A",
     "B": "B",
@@ -38,6 +49,7 @@ export default function ButtonRemapper() {
   const [mappings, setMappings] = useState(defaultMappings);
   const [generatedCode, setGeneratedCode] = useState('');
 
+  // Button masks remain the same...
   const buttonMasks = {
     "A": ["data1", "0x01"],
     "B": ["data1", "0x02"],
@@ -70,6 +82,7 @@ export default function ButtonRemapper() {
     "CRight": [1, "0x01"]
   };
 
+  // Existing handler functions remain the same...
   const handleMappingChange = (gcButton, n64Button) => {
     setMappings(prev => ({
       ...prev,
@@ -146,91 +159,117 @@ export default function ButtonRemapper() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <h1 className="text-3xl font-bold text-center mb-8">GameCube to N64 Button Remapper</h1>
-      
-      <div className="bg-white rounded-lg shadow-lg p-6">
-        <h2 className="text-xl font-semibold mb-4">Button Mappings</h2>
+    <div className="min-h-screen dark:bg-gray-900 transition-colors duration-200">
+      <div className="max-w-4xl mx-auto p-6">
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold text-center dark:text-white">GameCube to N64 Button Remapper</h1>
+          <button
+            onClick={() => setIsDark(!isDark)}
+            className="p-2 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+            aria-label="Toggle theme"
+          >
+            {isDark ? (
+              <Sun className="w-5 h-5 text-yellow-500" />
+            ) : (
+              <Moon className="w-5 h-5 text-gray-700" />
+            )}
+          </button>
+        </div>
         
-        <div className="grid gap-4 mb-8">
-          {gcButtons.map((gcButton) => (
-            <div key={gcButton} className="grid grid-cols-2 gap-4 items-center">
-              <label className="text-gray-700">GameCube {gcButton}:</label>
-              <select
-                value={mappings[gcButton] || "None"}
-                onChange={(e) => handleMappingChange(gcButton, e.target.value)}
-                className="form-select w-full rounded border-gray-300 shadow-sm"
-              >
-                <option value="None">None</option>
-                {n64Buttons.map((n64Button) => (
-                  <option key={n64Button} value={n64Button}>
-                    {n64Button}
-                  </option>
-                ))}
-              </select>
-            </div>
-          ))}
-        </div>
-
-        <div className="flex justify-center gap-4 mb-4">
-          <button
-            onClick={generateCode}
-            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-          >
-            <Code className="w-4 h-4 mr-2" />
-            Generate Code
-          </button>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+          <h2 className="text-xl font-semibold mb-4 dark:text-white">Button Mappings</h2>
           
-          <button
-            onClick={saveMappings}
-            className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-          >
-            <Download className="w-4 h-4 mr-2" />
-            Save Mappings
-          </button>
-          
-          <label className="inline-flex items-center px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700 cursor-pointer">
-            <Upload className="w-4 h-4 mr-2" />
-            Load Mappings
-            <input
-              type="file"
-              accept=".json"
-              onChange={loadMappings}
-              className="hidden"
-            />
-          </label>
-        </div>
-
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
-          <p className="text-blue-800 text-sm">
-            <strong>Instructions:</strong> After generating the code, copy the entire function and replace the existing 
-            <code className="mx-2 px-2 py-1 bg-blue-100 rounded">void mapGamecubeToN64()</code> 
-            function in your gamecube.ino file with this newly generated code.
-          </p>
-        </div>
-
-        {generatedCode && (
-          <div>
-            <h3 className="text-lg font-semibold mb-2">Generated Code:</h3>
-            <pre className="bg-gray-100 p-4 rounded overflow-x-auto">
-              {generatedCode}
-            </pre>
+          <div className="grid gap-4 mb-8">
+            {gcButtons.map((gcButton) => (
+              <div key={gcButton} className="grid grid-cols-2 gap-4 items-center">
+                <label className="text-gray-700 dark:text-gray-300">GameCube {gcButton}:</label>
+                <select
+                  value={mappings[gcButton] || "None"}
+                  onChange={(e) => handleMappingChange(gcButton, e.target.value)}
+                  className="form-select w-full rounded border-gray-300 dark:border-gray-600 
+                           bg-white dark:bg-gray-700 text-gray-900 dark:text-white 
+                           shadow-sm focus:border-blue-500 dark:focus:border-blue-400"
+                >
+                  <option value="None">None</option>
+                  {n64Buttons.map((n64Button) => (
+                    <option key={n64Button} value={n64Button}>
+                      {n64Button}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            ))}
           </div>
-        )}
-      </div>
 
-      <div className="fixed bottom-4 right-4">
-        <a
-          href="https://github.com/jarutherford/gc2n64-remapper"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors shadow-lg"
-        >
-          <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
-          </svg>
-          View on GitHub
-        </a>
+          <div className="flex justify-center gap-4 mb-4">
+            <button
+              onClick={generateCode}
+              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded 
+                       hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+            >
+              <Code className="w-4 h-4 mr-2" />
+              Generate Code
+            </button>
+            
+            <button
+              onClick={saveMappings}
+              className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded 
+                       hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600"
+            >
+              <Download className="w-4 h-4 mr-2" />
+              Save Mappings
+            </button>
+            
+            <label className="inline-flex items-center px-4 py-2 bg-orange-600 text-white rounded 
+                           hover:bg-orange-700 dark:bg-orange-500 dark:hover:bg-orange-600 cursor-pointer">
+              <Upload className="w-4 h-4 mr-2" />
+              Load Mappings
+              <input
+                type="file"
+                accept=".json"
+                onChange={loadMappings}
+                className="hidden"
+              />
+            </label>
+          </div>
+
+          <div className="bg-blue-50 dark:bg-blue-900 border border-blue-200 dark:border-blue-700 
+                        rounded-lg p-4 mb-8">
+            <p className="text-blue-800 dark:text-blue-200 text-sm">
+              <strong>Instructions:</strong> After generating the code, copy the entire function and replace the existing 
+              <code className="mx-2 px-2 py-1 bg-blue-100 dark:bg-blue-800 rounded">
+                void mapGamecubeToN64()
+              </code> 
+              function in your gamecube.ino file with this newly generated code.
+            </p>
+          </div>
+
+          {generatedCode && (
+            <div>
+              <h3 className="text-lg font-semibold mb-2 dark:text-white">Generated Code:</h3>
+              <pre className="bg-gray-100 dark:bg-gray-700 p-4 rounded overflow-x-auto 
+                          text-gray-800 dark:text-gray-200">
+                {generatedCode}
+              </pre>
+            </div>
+          )}
+        </div>
+
+        <div className="fixed bottom-4 right-4">
+          <a
+            href="https://github.com/jarutherford/gc2n64-remapper"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center px-4 py-2 bg-gray-800 dark:bg-gray-700 
+                     text-white rounded-lg hover:bg-gray-700 dark:hover:bg-gray-600 
+                     transition-colors shadow-lg"
+          >
+            <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+            </svg>
+            View on GitHub
+          </a>
+        </div>
       </div>
     </div>
   );
