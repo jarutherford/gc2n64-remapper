@@ -5,13 +5,18 @@ export default function ButtonRemapper() {
   const [isDark, setIsDark] = useState(true); // Default to dark mode
   
   useEffect(() => {
-    // Apply dark mode class to document on mount and when isDark changes
+    // Set initial dark mode class on mount
+    document.documentElement.classList.add('dark');
+  }, []); // Empty dependency array means this only runs once on mount
+
+  const toggleTheme = () => {
+    setIsDark(!isDark);
     if (isDark) {
-      document.documentElement.classList.add('dark');
-    } else {
       document.documentElement.classList.remove('dark');
+    } else {
+      document.documentElement.classList.add('dark');
     }
-  }, [isDark]);
+  };
 
   // Rest of the existing button definitions...
   const gcButtons = [
@@ -164,7 +169,7 @@ export default function ButtonRemapper() {
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-center dark:text-white">GameCube to N64 Button Remapper</h1>
           <button
-            onClick={() => setIsDark(!isDark)}
+            onClick={toggleTheme}
             className="p-2 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
             aria-label="Toggle theme"
           >
