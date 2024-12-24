@@ -132,13 +132,6 @@ export default function ButtonRemapper() {
     code += "    n64_buffer[2] = n64_x;\n";
     code += "    n64_buffer[3] = n64_y;\n";
     
-    // Add stick value conversion
-    code += "    // Use the conversion functions for stick values\n";
-    code += "    char n64_x, n64_y;\n";
-    code += "    gamecubeXYtoN64(gc_status.stick_x, gc_status.stick_y, &n64_x, &n64_y);\n";
-    code += "    n64_buffer[2] = n64_x;\n";
-    code += "    n64_buffer[3] = n64_y;\n";
-    
     code += "}\n";
     setGeneratedCode(code);
   };
