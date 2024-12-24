@@ -1,34 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { Code, Download, Upload, Moon, Sun } from 'lucide-react';
+// App.js
+import React, { useState } from 'react';
+import { Code, Download, Upload } from 'lucide-react';
+import ThemeToggle from './ThemeToggle';
 
 export default function ButtonRemapper() {
-  const [isDark, setIsDark] = useState(true);
-  
-  useEffect(() => {
-    // Check if dark mode preference exists in localStorage
-    const darkMode = localStorage.getItem('darkMode');
-    if (darkMode === 'false') {
-      setIsDark(false);
-      document.documentElement.classList.remove('dark');
-    } else {
-      setIsDark(true);
-      document.documentElement.classList.add('dark');
-    }
-  }, []);
-
-  const toggleTheme = () => {
-    const newDarkMode = !isDark;
-    setIsDark(newDarkMode);
-    localStorage.setItem('darkMode', newDarkMode.toString());
-    
-    if (newDarkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  };
-
-  // Rest of the existing button definitions...
+  // Button definitions
   const gcButtons = [
     "A", "B", "X", "Y", "Start", "L", "R", "Z",
     "DUp", "DDown", "DLeft", "DRight",
@@ -41,7 +17,7 @@ export default function ButtonRemapper() {
     "CUp", "CDown", "CLeft", "CRight"
   ];
 
-  // Initial mappings remain the same...
+  // Initial mappings
   const defaultMappings = {
     "A": "A",
     "B": "B",
@@ -64,7 +40,7 @@ export default function ButtonRemapper() {
   const [mappings, setMappings] = useState(defaultMappings);
   const [generatedCode, setGeneratedCode] = useState('');
 
-  // Button masks remain the same...
+  // Button masks
   const buttonMasks = {
     "A": ["data1", "0x01"],
     "B": ["data1", "0x02"],
@@ -97,7 +73,6 @@ export default function ButtonRemapper() {
     "CRight": [1, "0x01"]
   };
 
-  // Existing handler functions remain the same...
   const handleMappingChange = (gcButton, n64Button) => {
     setMappings(prev => ({
       ...prev,
@@ -178,17 +153,7 @@ export default function ButtonRemapper() {
       <div className="max-w-4xl mx-auto p-6">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-center dark:text-white">GameCube to N64 Button Remapper</h1>
-          <button
-            onClick={toggleTheme}
-            className="p-2 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
-            aria-label="Toggle theme"
-          >
-            {isDark ? (
-              <Sun className="w-5 h-5 text-yellow-500" />
-            ) : (
-              <Moon className="w-5 h-5 text-gray-700" />
-            )}
-          </button>
+          <ThemeToggle />
         </div>
         
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
